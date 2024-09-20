@@ -6,7 +6,7 @@
 /*   By: amacarul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 12:38:50 by amacarul          #+#    #+#             */
-/*   Updated: 2024/09/11 16:05:36 by amacarul         ###   ########.fr       */
+/*   Updated: 2024/09/18 11:36:18 by amacarul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ char	*ft_strnstr(const char *big, const char *little, size_t len)
 	const char	*start_big;
 	const char	*start_little;
 
+	if (little == NULL || big == NULL)
+		return (NULL);
 	if (!*little)
 		return ((char *)big);
 	while (*big && len > 0)

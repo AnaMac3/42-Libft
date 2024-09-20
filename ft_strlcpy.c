@@ -6,7 +6,7 @@
 /*   By: amacarul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 11:23:25 by amacarul          #+#    #+#             */
-/*   Updated: 2024/09/15 12:08:50 by amacarul         ###   ########.fr       */
+/*   Updated: 2024/09/19 10:42:00 by amacarul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,13 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 	size_t	src_len;
 	size_t	i;
 
-	if (src == NULL)
+	if (src == NULL || dst == NULL)
 		return (0);
 	src_len = ft_strlen(src);
-	i = 0;
 	if (size == 0)
 		return (src_len);
-	while (i < size - 1 && src[i])
+	i = 0;
+	while (i < (size - 1) && src[i] != '\0')
 	{
 		dst[i] = src[i];
 		i ++;

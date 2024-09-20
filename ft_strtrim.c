@@ -6,7 +6,7 @@
 /*   By: amacarul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/13 10:14:27 by amacarul          #+#    #+#             */
-/*   Updated: 2024/09/13 11:06:34 by amacarul         ###   ########.fr       */
+/*   Updated: 2024/09/19 15:34:08 by amacarul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,22 +15,22 @@
 char	*ft_strtrim(char const *s1, char const *set)
 {
 	char	*trimmed;
-	char	*start_trimmed;
 	size_t	start;
+	size_t	end;
+	size_t	total_len;
 
+	if (s1 == NULL)
+		return (NULL);
 	start = 0;
 	while (s1[start] && ft_strchr(set, s1[start]))
 		start ++;
-	trimmed = (char *)malloc(ft_strlen(s1 - start) + 1);
+	end = ft_strlen(s1);
+	while (end > start && ft_strchr(set, s1[end]))
+		end --;
+	total_len = end - start + 1;
+	trimmed = (char *)malloc(total_len + 1);
 	if (trimmed == NULL)
 		return (NULL);
-	start_trimmed = trimmed;
-	while (s1[start])
-	{
-		*trimmed = s1[start];
-		trimmed ++;
-		start ++;
-	}
-	*trimmed = '\0';
-	return (start_trimmed);
+	ft_strlcpy(trimmed, (s1 + start), (total_len + 1));
+	return (trimmed);
 }

@@ -6,7 +6,7 @@
 /*   By: amacarul <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/14 18:24:45 by amacarul          #+#    #+#             */
-/*   Updated: 2024/09/14 18:27:36 by amacarul         ###   ########.fr       */
+/*   Updated: 2024/09/17 17:23:18 by amacarul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ void	ft_putstr_fd(char *s, int fd)
 {
 	unsigned int	i;
 
+	if (s == NULL)
+		return ;
 	i = 0;
 	while (s[i])
 	{
