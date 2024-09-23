@@ -1,32 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memcpy.c                                        :+:      :+:    :+:   */
+/*   ft_lstclear_bonus.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amacarul <amacarul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/10 17:44:36 by amacarul          #+#    #+#             */
-/*   Updated: 2024/09/23 12:00:15 by amacarul         ###   ########.fr       */
+/*   Created: 2024/09/22 15:56:52 by amacarul          #+#    #+#             */
+/*   Updated: 2024/09/22 16:16:13 by amacarul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	*ft_memcpy(void *dest, const void *src, size_t n)
+void	ft_lstclear(t_list **lst, void (*del)(void *))
 {
-	unsigned char		*dst_temp;
-	const unsigned char	*src_temp;
-	size_t				pos;
+	t_list	*temp;
+	t_list	*next_temp;
 
-	if (dest == NULL && src == NULL)
-		return (NULL);
-	dst_temp = (unsigned char *) dest;
-	src_temp = (const unsigned char *) src;
-	pos = 0;
-	while (pos < n)
+	if (lst == NULL)
+		return ;
+	temp = *lst;
+	while (temp)
 	{
-		dst_temp[pos] = src_temp[pos];
-		pos ++;
+		next_temp = temp->next;
+		del(temp->content);
+		free (temp);
+		temp = next_temp;
 	}
-	return (dest);
+	*lst = NULL;
 }

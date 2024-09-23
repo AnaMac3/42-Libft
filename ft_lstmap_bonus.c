@@ -1,32 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memcpy.c                                        :+:      :+:    :+:   */
+/*   ft_lstmap_bonus.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amacarul <amacarul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/10 17:44:36 by amacarul          #+#    #+#             */
-/*   Updated: 2024/09/23 12:00:15 by amacarul         ###   ########.fr       */
+/*   Created: 2024/09/22 16:37:25 by amacarul          #+#    #+#             */
+/*   Updated: 2024/09/23 12:28:41 by amacarul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	*ft_memcpy(void *dest, const void *src, size_t n)
+t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 {
-	unsigned char		*dst_temp;
-	const unsigned char	*src_temp;
-	size_t				pos;
+	t_list	*result;
+	t_list	*temp;
+	void	*content;
 
-	if (dest == NULL && src == NULL)
-		return (NULL);
-	dst_temp = (unsigned char *) dest;
-	src_temp = (const unsigned char *) src;
-	pos = 0;
-	while (pos < n)
+	result = NULL;
+	while (lst)
 	{
-		dst_temp[pos] = src_temp[pos];
-		pos ++;
+		content = f(lst->content);
+		if (content == NULL)
+		{
+			ft_lstclear(&result, del);
+			return (NULL);
+		}
+		temp = ft_lstnew(content);
+		if (temp == NULL)
+		{
+			ft_lstclear(&result, del);
+			return (NULL);
+		}
+		ft_lstadd_back(&result, temp);
+		lst = lst->next;
 	}
-	return (dest);
+	return (result);
 }

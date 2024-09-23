@@ -64,6 +64,8 @@ Prototipo:
 Prototipo: void    *ft_memcpy(void *dest, const void *src, size_t n)
 
 	Para copiar los bytes de un puntero const void* a un puntero void* hay que tratar ambos punteros como unsigne char* o char*. Estos son los tipos de datos adecuados para manipular datos a nivel de bytes, ya que ocupan exactamente un byte.
+	
+	ATENCIÓN --> Aqui no he protegido de dest == NULL y src == NULL en general. La función original, por supuesto, da segfault con dest o src == NULL y n > 0; pero en cambio, con dest y src NULL, devuelve NULL; y con dest o src NULL y n = 0, devuelve tb null. Así que he dejado el null para las ocasiones en las que la función real devuelve null y he dejado que se rompa en las demás.
 
 • memmove --> copia n bytes del área de memoria src al área de memoria dest. Las áreas de memoria pueden superponerse: la copia tiene lugar de la siguiente manera: los bytes de src se copian primero en un array de memoria que no se superpone ni a src ni a dest, y después esos bytes de memoria se pasan del array temporal a dest.
 Devuelve un puntero a dest.
@@ -77,6 +79,30 @@ Pero si dest y src se solapan, memmove va a copiar src entero en dest, y lo que 
 	Para determinar solapamiento:
 	si dest está antes de src, no hay solapamiento.
 	si dest está después del final de src (s+n), tampoco hay solapamiento
+
+	La copia de atrás hacia delante se hace así: 
+	
+	while (n--)
+                {
+                        *(--char_dest) = *(--char_src);
+                }
+                
+        Que creo que es lo mismo que esto, pero con algunas diferencias.
+        while (n)
+                {
+                        *char_dest = *char_src;
+                        char_dest --;
+                        char_src --;
+                        n --;
+                }
+	
+	En el primer caso se decrementan los punteros antes de acceder a los valores.
+	Se copia el valor que hay en la dirección char_src a char_dest después de decrementar
+	el puntero. 
+	En el segundo se copia y luego se decrementa.
+
+
+
 
 • strlcpy --> copia una cadena de tamaño limitado. 
 Prototipo: size_t  strlcpy(char *dst, const char *src, size_t size)
@@ -101,6 +127,17 @@ DIFERENCIA ENTRE TAMAÑO DE BUFFER Y SU LONGITUD:
 Buffer: región de memoria del ordenador, reservada para almacenar datos. En C, un buffer es un arreglo de caracteres (char array) que se usa para almacenar una cadena.
 El tamaño del buffer es la cantidad total de espacio en memoria que ha sido reservado para el buffer. Incluye el espacio para todos los caracteres de la cadena más el carácter nulo final. El tamaño de char buffer[10] son 10 caracteres.
 La longitud de la cadena es el número de caracteres que tiene, excluyendo el carácter nulo final. La longitud de la cadena "Hello" es 5, aunque esté almacenado en un buffer de tamaño 10.
+
+Se supone que strlcat debe añadir size - strlen(dst) - 1 byte de src a dst, con carácter nulo final. 
+¿Qué pasa cuando el buffer size es menor que la longitud de dst? En este caso, strlcat no puede concatenar nada de src a dst, pero debe devolver el tamaño que la cadena combinada tendría. Y ese tamaño es size + strlen(src) --> cuánto espacio sería necesario, tomando en cuenta que la cadena de destino (con el tamaño restringido por size) no puede crecer más. 
+Osea que si size <= strlen(dst), dst_len pasa a ser == size.
+	NO ENTIENDO ESTO BIEN --> No entiendo por qué size + src_len es el tamaño mínimo necesario que se necesitaría para hacer la concatenación correcta, por qué ese es el espacio necesario para concatenar correctamente. 
+	Si devolviese dst_len + src_len es como si hubiese hecho la concatenación bien.
+	Conceptualmente el tamaño mínimo necesario para concatenar src a dst es dst_len + src_len. La razón por la que se devuelve size + src_len es para respetar el tamaño del buffer proporcionado (size) y advertir que no es suficiente para poder concatenar.
+
+	¿Qué es una cadena real en C / true "C" string? (según chatgpt)-->
+	Una cadena real es un arreglo de caracteres que termina en carácter nulo ('\0'). 
+	Un *s = NULL es un puntero a un char que no apunta a ninguna dirección válida de la memoria. No se considera una cadena válida o real. Intentar acceder a este puntero causaría un comportmiento indefinido, porque no se puede leer ni escribir en la dirección NULL. 
 
 • toupper --> si c es una letra minúscula, devuelve su equivalente en mayúscula, si existe mayúscula en el local. Si no existe, devuelve c.
 Prototipo: int     toupper(int c)
@@ -134,6 +171,8 @@ Localiza la primera ocurrencia de la string little (que termina en nulo) en la s
 Los caracteres que aparecen después del \0 no se buscan. 
 Devuelve: si little es una string vacía, devuelve big. Si little no aparece en big, devuelve NULL. En los otros casos, se devuelve un puntero al primer caracter de la primera ocurrencia de little.
 
+	ATENCIÓN! --> como ya se devuelve null cuando little no aparece en big, no voy a devolver null en los casos de big == NULL o little == NULL... Porque si no es confuso. Dejo que se rompa.
+
 • atoi --> convierte la porción inicial de la string apuntada por nptr a int. Mismo comportamiento que strtol(nptr, NULL, 10), solo que atoi no detecta errores. 
 Devuelve el valor convertido o 0 en caso de error.
 
@@ -163,7 +202,7 @@ Funciones adicionales:
 
 • ft_substr --> reserva memoria con malloc(3) y devuelve una substring de la string s, que empieza desde el índie start y tiene longitud máxima len.
 Devuelve la substring resultante y NULL si falla la reserva de memoria.
-Prototipo: i
+
 
 • ft_strjoin --> genera una nueva string añadiendo la string s2 a la string s1. Devuelve NULL si falla la memoria. Reserva con malloc(3) y devuelve una nueva string formada por la concatenación de s1 y s2.
 Prototipo: char *ft_strjoin(char const *s1, char const *s2)
@@ -171,6 +210,42 @@ Prototipo: char *ft_strjoin(char const *s1, char const *s2)
 • ft_strtrim --> Elimina todos los caracteres de la string set desde el principio hasta el final de la string s1, hasta encontrar un caracter no perteneciente a set. La string resultante se devuelve con una reserva de malloc. 
 Devuelve la string recortada. Devuelve NULL si falla la reserva de memoria.
 Prototipo: char    *ft_strtrim(char const *s1, char const *set)
+
+	Aquí solo contemplo si s1 == NULL, porque si set == NULL, start se queda en 0 (ft_strchr devolverá NULL y start no sumará), y entonces la cadena que se devuelve al final de la función será s1 al completo.
+	
+	Explicación de mi función:
+char    *ft_strtrim(char const *s1, char const *set)
+{
+        char    *trimmed;
+        char    *start_trimmed;
+        size_t  start;
+
+        if (s1 == NULL)
+                return (NULL);
+    //Mientras estemos en un caracter de s1 y mientras strchr de
+    //set y s1[start] no de nulo (es decir, mientras el carácter de s1
+    //se encuentre en set, avanzamos al siguiente caracter de s1
+    //	TIENE QUE HACER ESTO MISMO TB DESDE EL FINAL
+        start = 0;
+        while (s1[start] && ft_strchr(set, s1[start]))
+                start ++;
+    //damos memoria a la cadena recortada y le hacemos una temporal
+        trimmed = (char *)malloc(ft_strlen(s1 - start) + 1);
+        if (trimmed == NULL)
+                return (NULL);
+        start_trimmed = trimmed;
+    //
+        while (s1[start])
+        {
+                *trimmed = s1[start];
+                trimmed ++;
+                start ++;
+        }
+        *trimmed = '\0';
+        return (start_trimmed);
+}
+
+
 
 • ft_split --> Reserva con malloc un array de strings resultante de separar la string s en substrings utilizando el caracter c como delimitador. El array termina con un puntero NULL.
 Hay que usar malloc y free.
@@ -199,8 +274,6 @@ Pasos:
 Prototipo: void    ft_striteri(char *s, void (*f)(unsigned int, char*))
 
 
-
-
 • ft_substr
 
 • ft_putchar_fd --> Envía el caracter c al file descriptor especificado.
@@ -208,7 +281,7 @@ Prototipo: void    ft_striteri(char *s, void (*f)(unsigned int, char*))
 	File descriptor (fd): abstracción para manejar recursos entrada/salida (I/O). Es un número entero que el kernel del sistema operativo asigna a un programa cuando este abre un archivo o algún otro recurso que requiere I/O. 
 	Cuando abres un archivo en C usando la función open(), el sistm operativo devuelve un file descriptor.
 	
-Funciones autorizadas: write
+Funciones autorizadas: writeFstrlc
 void    ft_putchar_fd(char c, int fd)
 
 	Cómo funciona write --> ssize_t write(int fd, const void *buf, size_t count)
@@ -238,4 +311,103 @@ PARTE BONUS:
 
 Estructuras, listas --> explicaciones en C08...
 En el Makefile --> regla make bonus que incorpore las funciones bonus a la libft.a
+En la libft.h --> estructura s_list
+
+
+typedef struct  s_list
+{
+        void            *content;
+        struct  s_list  *next;
+}
+                        t_list;
+
+
+	content --> información contenida por el nodo
+	void * --> permite guardar cualquier tipo de información
+	next --> la dirección del siguiente nodo, o NULL si el siguiente nodo es el último
 	
+EXPLICACIÓN LISTAS: 
+
+linked list / lista enlazada --> estructura de datos lineal, como un array, pero en la que los elementos no están almacenados de manera contigua en la memoria. Cada elemento, llamado nodo, contiene un puntero que apunta al siguiente nodo en la lista.
+Esto permite que las listas enlazadas sean dinámicas en tamaño: se pueden agregar o eliminar elementos sin necesidad de reorganizar la memoria. Los arrays, en cambio, tienen tamaño fijo. 
+
+Un nodo es un elemento que contiene datos (en nuestro caso esto es el campo content) y un puntero al siguiente nodo (campo next). Si llegas a un nodo cuyo puntero next es NULL, significa que has llegado al final de la lista. 
+
+La palabra typedef define un alias para struct s_list, así que cada vez que declaremos un nod, en vez de escribir struct s_list, escribimos simplemente t_list.
+
+Para crear un nodo --> asignarle memoria y llenar sus campos:
+t_list	*node1 = malloc(sizeof(t_list));
+node1->content = strdup("Hola");
+node1->next = NULL;
+
+Conectar nodos --> asignar puntero next al nodo siguiente:
+t_list	*node2 = malloc(sizeof(t_list));
+node2->content = strdup("Hola");
+node1->next = node2;
+node2->next = NULL
+
+Recorrer todos los nodos de una lista:
+t_list *current = node1;
+while(current != NULL)
+{
+	printf("%s\n", (char *)current->content);
+	current = current->next;
+}
+
+AÑADIR PARTE BONUS AL MAKEFILE
+Crear BONUS_SRC y BONUS_OBJ + regla bonus donde incluya OBJ_FILES, BONUS_OBJ, y no sé si más cosas, y luego añadir a clean tb los BONUS_OBJ y luego un rebonus que haga fclean bonus
+...
+
+Funciones:
+
+• ft_lstnew --> crea un nuevo nodo con malloc. La variable miembr content se inicializa con el contenido del parámetro content. La variable next, con NULL.
+Si el lstnew da error, es porque el contenido hay que metérselo con strdup...
+
+• ft_lstadd_front --> añade el nodo new al principio de la lista lst.
+Prototipo: void ft_lstadd_front(t_list **lst, t_list *new)
+lst es la dirección de un puntero al primer nodo de una lista, y new un puntero al nodo que añadir al principio de la lista. No devuelve nada.
+
+• ft_lstsize --> cuenta el número de nodos de una lista.
+Prototipo: int ft_lstsize(t_list *lst);
+
+• ft_lstlast --> devuelve el último nodo de la lista lst.
+Prototipo: t_list  *ft_lstlast(t_list *lst)
+
+• ft_lstadd_back --> añade el nodo new al final de la lista lst.
+Prototipo: void ft_lstadd_back(t_list **lst, t_list *new);
+
+• ft_lstclear --> elimina y libera el nodo lst dado y todos los consecutivos de ese nodo, utilizando la función del y free. Al final, el puntero de la lista debe ser NULL.
+Prototipo: void    ft_lstclear(t_list **lst, void (*del)(void *))
+
+• ft_lstiter --> Itera la lista lst y aplica la función f en el contenido de cada nodo.
+Prototipo: void ft_lstiter(t_list *lst, void (*f)(void *));
+
+• ft_lstmap --> Itera la lista lst y aplica la función f al contenido de cada nodo. Crea una lista resultante de la aplicación correcta y sucesiva de la función f sobre cada nodo. La función del se utiliza para eliminar el contenido de un nodo, si hace falta.
+Funciones autorizadas: malloc y free.
+Devuelve la nueva lista o NULL si falla la reserva de memoria. 
+Prototipo: t_list *ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
+
+	--> void *(*f)(void *) --> Puntero a función que toma un argumento de tipo void * y devuelve un valor void *
+	--> void (*f)(void*) --> La que se usa en ft_lstiter --> Puntero a función que toma un argumento tipo void * y no devuelve nada.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

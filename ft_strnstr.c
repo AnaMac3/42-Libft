@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strnstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amacarul <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: amacarul <amacarul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 12:38:50 by amacarul          #+#    #+#             */
-/*   Updated: 2024/09/18 11:36:18 by amacarul         ###   ########.fr       */
+/*   Updated: 2024/09/23 12:23:56 by amacarul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,28 +14,20 @@
 
 char	*ft_strnstr(const char *big, const char *little, size_t len)
 {
-	const char	*start_big;
-	const char	*start_little;
+	size_t	start;
+	size_t	i;
 
-	if (little == NULL || big == NULL)
-		return (NULL);
-	if (!*little)
+	start = 0;
+	if (little[start] == '\0')
 		return ((char *)big);
-	while (*big && len > 0)
+	while (big[start] != '\0' && len > start)
 	{
-		start_big = big;
-		start_little = little;
-		while (*little && (len > 0) && (*big == *little))
-		{
-			big ++;
-			little ++;
-			len --;
-		}
-		if (!*little)
-			return ((char *)start_big);
-		little = start_little;
-		big = start_big + 1;
-		len --;
+		i = 0;
+		while (little[i] && (len > start + i) && (big[start + i] == little[i]))
+			i ++;
+		if (little[i] == '\0')
+			return ((char *)(big + start));
+		start ++;
 	}
 	return (NULL);
 }

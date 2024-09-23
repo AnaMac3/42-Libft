@@ -1,32 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_memcpy.c                                        :+:      :+:    :+:   */
+/*   ft_lstadd_back_bonus.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amacarul <amacarul@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/10 17:44:36 by amacarul          #+#    #+#             */
-/*   Updated: 2024/09/23 12:00:15 by amacarul         ###   ########.fr       */
+/*   Created: 2024/09/20 17:27:01 by amacarul          #+#    #+#             */
+/*   Updated: 2024/09/22 12:13:25 by amacarul         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	*ft_memcpy(void *dest, const void *src, size_t n)
+void	ft_lstadd_back(t_list **lst, t_list *new)
 {
-	unsigned char		*dst_temp;
-	const unsigned char	*src_temp;
-	size_t				pos;
-
-	if (dest == NULL && src == NULL)
-		return (NULL);
-	dst_temp = (unsigned char *) dest;
-	src_temp = (const unsigned char *) src;
-	pos = 0;
-	while (pos < n)
+	t_list	*last_node;
+	
+	if (lst == NULL && new == NULL)
+		return ;
+	if (*lst == NULL)
 	{
-		dst_temp[pos] = src_temp[pos];
-		pos ++;
+		*lst = new;
+		return ;
 	}
-	return (dest);
+	last_node = ft_lstlast(*lst);
+	last_node->next = new;
 }
